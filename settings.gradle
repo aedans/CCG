@@ -1,0 +1,5 @@
+rootProject.name = 'ccg'
+
+include 'backend'
+include 'simple-client'
+include 'simple-server'
