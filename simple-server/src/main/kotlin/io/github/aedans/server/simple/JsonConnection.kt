@@ -4,7 +4,6 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import io.github.aedans.ccg.backend.Card
 import io.github.aedans.ccg.backend.ConnectionGroup
-import io.github.aedans.ccg.backend.Player
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 
