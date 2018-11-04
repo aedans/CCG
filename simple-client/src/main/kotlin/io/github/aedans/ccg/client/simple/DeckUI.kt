@@ -7,7 +7,6 @@ import java.io.File
 import javax.swing.ImageIcon
 import javax.swing.JScrollPane
 import javax.swing.ScrollPaneConstants
-import javax.swing.WindowConstants
 
 class DeckUI(mainMenu: MainMenu, deck: Deck) : KFrame("Deck Builder") {
     private val cards: MutableList<String> = mutableListOf()
@@ -15,14 +14,21 @@ class DeckUI(mainMenu: MainMenu, deck: Deck) : KFrame("Deck Builder") {
     val name = KTextField(deck.name)
 
     val save = KButton("Save") {
-        File(DecksMenu.deckFile, name.text).writeText(cards.joinToString("\n", "", ""))
+        File(Deck.deckFile, name.text)
+            .writeText((listOf(starter1.text, starter2.text, starter3.text) + cards)
+            .joinToString("\n", "", ""))
     }
 
     val delete = KButton("Delete") {
-        File(DecksMenu.deckFile, name.text).delete()
+        File(Deck.deckFile, name.text).delete()
     }
 
     val size = KLabel("")
+
+    val starters = KLabel("Starters: ")
+    val starter1 = KTextField(deck.starter1)
+    val starter2 = KTextField(deck.starter2)
+    val starter3 = KTextField(deck.starter3)
 
     val exit = KButton("Exit") {
         isVisible = false
@@ -30,7 +36,7 @@ class DeckUI(mainMenu: MainMenu, deck: Deck) : KFrame("Deck Builder") {
     }
 
     val menu = KHorizontalList().apply {
-        addAll(this@DeckUI.name, save, delete, this@DeckUI.size, exit)
+        addAll(this@DeckUI.name, save, delete, this@DeckUI.size, exit, starters, starter1, starter2, starter3)
     }
 
     private val cardList = KPanel().apply {
@@ -74,8 +80,6 @@ class DeckUI(mainMenu: MainMenu, deck: Deck) : KFrame("Deck Builder") {
     }
 
     init {
-        defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-
         layout = BorderLayout()
 
         deck.cards.forEach { add(it) }

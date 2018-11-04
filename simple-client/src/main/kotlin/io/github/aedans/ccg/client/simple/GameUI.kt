@@ -9,13 +9,11 @@ import io.github.aedans.server.simple.write
 import java.awt.BorderLayout
 
 data class GameUI(val name1: String, val name2: String) : KFrame("Game between $name1 and $name2") {
-    val hand = Hand()
+    val hand = KHorizontalList()
 
     init {
-        add(hand, BorderLayout.PAGE_END)
+        add(hand, BorderLayout.SOUTH)
     }
-
-    inner class Hand : KHorizontalList()
 
     companion object {
         fun start(player1: Player, connection: Connection) {

@@ -7,12 +7,14 @@ class UIConnection(val name: String, val gameUI: GameUI) : ConnectionGroup {
     override fun addToHand(name: String, cards: List<Card>) {
         if (name == this.name) {
             cards.forEach { gameUI.hand.add(CardComponent(it)) }
+            gameUI.pack()
         }
     }
 
     override fun draw(name: String, cards: List<Card>) {
         if (name == this.name) {
             cards.forEach { gameUI.hand.add(CardComponent(it)) }
+            gameUI.pack()
         }
     }
 }
