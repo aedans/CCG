@@ -7,11 +7,9 @@ class Game(private val connection: ConnectionGroup) {
     }
 
     fun Player.draw(i: Int = 0) = run {
-        connection.draw(name, i)
-        if (library.size <= i)
-            copy(hand = hand + library, library = emptyList())
-        else
-            copy(hand = hand + library.take(i), library = library.drop(i))
+        val number = if (library.size <= i) library.size else i
+        connection.draw(name, library.take(number))
+        copy(hand = hand + library.take(number), library = library.drop(number))
     }
 
     fun run(players: List<Player>) {

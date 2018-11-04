@@ -2,7 +2,7 @@ package io.github.aedans.ccg.backend
 
 interface ConnectionGroup {
     fun addToHand(name: String, cards: List<Card>)
-    fun draw(name: String, i: Int)
+    fun draw(name: String, cards: List<Card>)
 
     fun combine(b: ConnectionGroup) = object : ConnectionGroup {
         override fun addToHand(name: String, cards: List<Card>) {
@@ -10,9 +10,9 @@ interface ConnectionGroup {
             b.addToHand(name, cards)
         }
 
-        override fun draw(name: String, i: Int) {
-            this@ConnectionGroup.draw(name, i)
-            b.draw(name, i)
+        override fun draw(name: String, cards: List<Card>) {
+            this@ConnectionGroup.draw(name, cards)
+            b.draw(name, cards)
         }
     }
 }

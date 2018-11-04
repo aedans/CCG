@@ -6,8 +6,17 @@ import io.github.aedans.server.simple.Connection
 import io.github.aedans.server.simple.JsonConnection
 import io.github.aedans.server.simple.read
 import io.github.aedans.server.simple.write
+import java.awt.BorderLayout
 
 data class GameUI(val name1: String, val name2: String) : KFrame("Game between $name1 and $name2") {
+    val hand = Hand()
+
+    init {
+        add(hand, BorderLayout.PAGE_END)
+    }
+
+    inner class Hand : KHorizontalList()
+
     companion object {
         fun start(player1: Player, connection: Connection) {
             val connection2 = JsonConnection.create(connection)

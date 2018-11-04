@@ -1,11 +1,11 @@
 package io.github.aedans.ccg.client.simple
 
 import java.awt.Component
-import javax.swing.BoxLayout
+import javax.swing.JPanel
 
-open class KMenuFrame(title: String) : KFrame(title) {
+open class KPanel : JPanel() {
     init {
-        layout = BoxLayout(contentPane, BoxLayout.PAGE_AXIS)
+        font = font.deriveFont(font.size * 2f)
     }
 
     fun addAll(components: List<Component>) {

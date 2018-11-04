@@ -12,7 +12,7 @@ data class JsonConnection(val input: JsonReader, val output: JsonWriter) : Conne
 
     }
 
-    override fun draw(name: String, i: Int) {
+    override fun draw(name: String, cards: List<Card>) {
 
     }
 

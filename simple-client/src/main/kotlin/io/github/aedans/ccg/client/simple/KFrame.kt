@@ -1,6 +1,7 @@
 package io.github.aedans.ccg.client.simple
 
 import java.awt.Dimension
+import java.awt.Toolkit
 import javax.swing.JFrame
 
 open class KFrame(title: String) : JFrame() {

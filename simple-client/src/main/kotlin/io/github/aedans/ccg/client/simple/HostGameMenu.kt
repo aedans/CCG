@@ -5,22 +5,27 @@ import io.github.aedans.server.simple.Server
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @UseExperimental(InternalCoroutinesApi::class)
-object HostGameMenu : KMenuFrame("Host Game", PortBox, NameBox, Submit, Cancel) {
-    object PortBox : KTextField("8080")
-    object NameBox : KTextField("Player 1")
-    object Submit : KButton("Submit", {
-        val connection = Server.host(PortBox.text.toInt())
+class HostGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Host Game") {
+    private val portBox = KTextField("8080")
+    private val nameBox = KTextField("Player 1")
+    private val submit = KButton("Submit") {
+        val connection = Server.host(portBox.text.toInt())
         val waitingFor = WaitingFor(connection)
         connection.invokeOnCompletion(onCancelling = true) {
-            if (it != null) HostGameMenu.isVisible = true
+            if (it != null) isVisible = true
             waitingFor.isVisible = false
         }
-        HostGameMenu.isVisible = false
-        GameUI.start(Player(NameBox.text, emptyList(), emptyList(), emptyList()), connection.await())
-    })
+        isVisible = false
+        GameUI.start(Player(nameBox.text, emptyList(), emptyList(), emptyList()), connection.await())
+    }
 
-    object Cancel : KButton("Cancel", {
-        HostGameMenu.isVisible = false
-        MainMenu.isVisible = true
-    })
+    private val cancel = KButton("Cancel") {
+        mainMenu.isVisible = true
+        isVisible = false
+    }
+
+    init {
+        addAll(portBox, nameBox, submit, cancel)
+        pack()
+    }
 }

@@ -1,23 +1,25 @@
 package io.github.aedans.ccg.client.simple
 
-import javax.swing.SwingUtilities
-import javax.swing.UIManager
+class MainMenu : KMenuFrame("CCG Simple Client") {
+    private val hostGameButton =  KButton("Host Game") {
+        HostGameMenu(this@MainMenu)
+        isVisible = false
+    }
 
-object MainMenu : KMenuFrame("CCG Simple Client", HostGameButton, JoinGameButton, ExitButton) {
-    object HostGameButton : KButton("Host Game", {
-        HostGameMenu.isVisible = true
-        MainMenu.isVisible = false
-    })
+    private val joinGameButton = KButton("Join Game") {
+        JoinGameMenu(this@MainMenu)
+        isVisible = false
+    }
 
-    object JoinGameButton : KButton("Join Game", {
-        JoinGameMenu.isVisible = true
-        MainMenu.isVisible = false
-    })
+    private val decksButton = KButton("Decks") {
+        DecksMenu(this@MainMenu)
+        isVisible = false
+    }
 
-    object ExitButton : KButton("Exit", { System.exit(0) })
+    private val exitButton = KButton("Exit") { System.exit(0) }
 
     init {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-        SwingUtilities.updateComponentTreeUI(this)
+        addAll(hostGameButton, joinGameButton, decksButton, exitButton)
+        pack()
     }
 }
