@@ -14,7 +14,7 @@ class JoinGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Join Game") {
     private val submit = KButton("Submit") {
         val connection = Server.join(ipBox.text, portBox.text.toInt())
         val waitingFor = WaitingFor(connection)
-        connection.invokeOnCompletion(onCancelling = true) {
+        connection.invokeOnCompletion(onCancelling = true) @Suppress("NestedLambdaShadowedImplicitParameter") {
             if (it != null) {
                 isVisible = true
                 KExceptionPopup(it)
@@ -27,7 +27,8 @@ class JoinGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Join Game") {
             nameBox.text,
             listOf(Card.card(deck.starter1), Card.card(deck.starter2), Card.card(deck.starter3)),
             deck.cards.map(Card.Companion::card),
-            emptyList()
+            emptyList(),
+            15
         )
         GameUI.start(player, connection.await())
     }

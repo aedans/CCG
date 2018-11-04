@@ -24,7 +24,8 @@ class HostGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Host Game") {
             nameBox.text,
             listOf(Card.card(deck.starter1), Card.card(deck.starter2), Card.card(deck.starter3)),
             deck.cards.map(Card.Companion::card),
-            emptyList()
+            emptyList(),
+            15
         )
         GameUI.start(player, connection.await())
     }

@@ -11,6 +11,11 @@ class MainMenu : KMenuFrame("CCG Simple Client") {
         isVisible = false
     }
 
+    private val solitaireGameButton = KButton("Solitaire Game") {
+        SolitaireGameMenu(this@MainMenu)
+        isVisible = false
+    }
+
     private val decksButton = KButton("Decks") {
         DecksMenu(this@MainMenu)
         isVisible = false
@@ -19,7 +24,7 @@ class MainMenu : KMenuFrame("CCG Simple Client") {
     private val exitButton = KButton("Exit") { System.exit(0) }
 
     init {
-        addAll(hostGameButton, joinGameButton, decksButton, exitButton)
+        addAll(hostGameButton, joinGameButton, solitaireGameButton, decksButton, exitButton)
         pack()
     }
 }

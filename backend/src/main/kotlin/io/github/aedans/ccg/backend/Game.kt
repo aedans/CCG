@@ -13,8 +13,11 @@ class Game(private val connection: ConnectionGroup) {
     }
 
     fun run(players: List<Player>) {
-        players
-            .map { it.addToHand(it.starting) }
-            .map { it.draw(3) }
+        var players = players
+        players = players.map { it.addToHand(it.starting) }
+        players = players.map { it.draw(3) }
+        while (players.any { it.life >= 0 }) {
+            
+        }
     }
 }
