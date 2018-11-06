@@ -1,5 +1,8 @@
 package io.github.aedans.server.simple
 
+import io.github.aedans.ccg.backend.Connection
+import io.github.aedans.ccg.backend.ReaderT
+import io.github.aedans.ccg.backend.WriterT
 import kotlinx.coroutines.*
 import java.net.ServerSocket
 import java.net.Socket
@@ -15,7 +18,7 @@ object Server {
             } catch (e: SocketException) {
                 throw CancellationException(e.message)
             }
-            Connection(socket.getInputStream(), socket.getOutputStream())
+            Connection(ReaderT.create(socket.getInputStream()), WriterT.create(socket.getOutputStream()))
         }
         async.invokeOnCompletion(onCancelling = true) {
             if (it != null) serverSocket.close()
@@ -26,7 +29,7 @@ object Server {
     fun join(host: String, port: Int): Deferred<Connection> = run {
         val async = GlobalScope.async {
             val socket = Socket(host, port)
-            Connection(socket.getInputStream(), socket.getOutputStream())
+            Connection(ReaderT.create(socket.getInputStream()), WriterT.create(socket.getOutputStream()))
         }
         async
     }

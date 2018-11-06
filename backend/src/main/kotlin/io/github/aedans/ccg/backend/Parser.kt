@@ -14,7 +14,7 @@ object Parser {
 
     @Suppress("unused")
     sealed class Result<out R, out T> {
-        class Failure() : Result<Nothing, Nothing>()
+        object Failure : Result<Nothing, Nothing>()
         data class Success<out R, out T>(val value: R, val rest: Sequence<T>) : Result<R, T>()
     }
 
@@ -22,7 +22,7 @@ object Parser {
         if (input.any() && predicate(input.first()))
             Result.Success(input.first(), input.drop(1))
         else
-            Result.Failure()
+            Result.Failure
     }
 
     fun <A, B, T> mapParser(parser: Parser<A, T>, fn: (Result<A, T>) -> Result<B, T>) = Parser<B, T> { input  ->
@@ -107,4 +107,15 @@ object Parser {
     val exprParser: Parser<Expr, Char> = alternativeParser(stringParser, alternativeParser(identifierParser, listExprParser))
 
     val parser: Parser<Sequence<Expr>, Char> = repeatParser(exprParser)
+
+    fun <R> parse(string: String, p: Parser<R, Char>) = run {
+        val result = p(string.asSequence())
+        when (result) {
+            is Result.Failure -> throw Exception("Could not parse $string")
+            is Result.Success -> if (result.rest.any())
+                throw Exception("Could not parse at char '${result.rest.first()}'")
+            else
+                result.value
+        }
+    }
 }

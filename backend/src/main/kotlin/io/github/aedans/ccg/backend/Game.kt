@@ -1,35 +1,54 @@
 package io.github.aedans.ccg.backend
 
-class Game(private val connection: ConnectionGroup) {
-    fun Player.addToHand(cards: List<Card>) = run {
-        connection.addToHand(name, cards)
+import io.github.aedans.ccg.backend.MRep.Companion.string
+
+class Game(private val connections: Map<String, Connection>) {
+    private fun write(string: String) = connections.values.forEach { it.write(string) }
+
+    private fun Player.addToHand(cards: List<Card>) = run {
+        write("(add-to-hand ${string(name)} ${string(cards.map { string(it) })})")
         copy(hand = hand + cards)
     }
 
-    fun Player.draw(i: Int = 0) = run {
+    private fun Player.draw(i: Int = 1) = run {
         val number = if (library.size <= i) library.size else i
-        connection.draw(name, library.take(number))
-        copy(hand = hand + library.take(number), library = library.drop(number))
+        val cards = library.take(number)
+        write("(draw ${string(name)} ${string(cards.map { string(it) })})")
+        copy(hand = hand + cards, library = library.drop(number))
     }
 
-    fun Player.addMana(i: Int = 1) = run {
-        connection.addMana(name, i)
+    private fun Player.addMana(i: Int = 1) = run {
+        write("(add-mana ${string(name)} ${string(i)})")
         copy(mana = mana + i)
     }
 
-    fun Player.gainLife(i: Int = 1) = run {
-        connection.gainLife(name, i)
+    private fun Player.gainLife(i: Int = 1) = run {
+        write("(gain-life ${string(name)} ${string(i)})")
         copy(life = life + 1)
     }
 
+    private fun Player.nextAction() = run {
+        connections[name]!!.read()
+    }
+
     fun run(players: List<Player>) {
-        var players = players
+        var turn = 0
+        @Suppress("NAME_SHADOWING") var players = players
         players = players.map { it.addToHand(it.starting) }
         players = players.map { it.draw(3) }
         players = players.map { it.addMana() }
         players = players.map { it.gainLife(15) }
-        while (players.any { it.life >= 0 }) {
-            
+        while (true) {
+            players.forEach { player ->
+                turn++
+                var nextAction: String
+                do {
+                    nextAction = player.nextAction()!!
+                    println(nextAction)
+                } while (nextAction != "null")
+                if (turn % (players.size + 1) == 0) players.map { it.addMana() }
+            }
+            players.map { it.draw() }
         }
     }
 }

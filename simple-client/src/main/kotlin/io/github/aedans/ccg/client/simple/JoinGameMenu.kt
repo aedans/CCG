@@ -4,6 +4,7 @@ import io.github.aedans.ccg.backend.Card
 import io.github.aedans.ccg.backend.Player
 import io.github.aedans.server.simple.Server
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 
 @UseExperimental(InternalCoroutinesApi::class)
 class JoinGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Join Game") {
@@ -28,7 +29,11 @@ class JoinGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Join Game") {
             listOf(Card.card(deck.starter1), Card.card(deck.starter2), Card.card(deck.starter3)),
             deck.cards.map(Card.Companion::card)
         )
-        GameUI.start(player, connection.await())
+        val (readerT, writerT) = connection.await()
+        writerT.write(player.mRep())
+        val ui = GameUI(player.name)
+        launch { readerT.pipe(ui) }
+        launch { ui.pipe(writerT) }
     }
 
     private val cancel = KButton("Cancel") {

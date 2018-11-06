@@ -1,5 +1,5 @@
 (def name "Sanguimancer Adept")
-(def type "Creature")
-(def cost "(1) {Onyx}")
 (def text "When Sanguimancer Adept enters the battlefield or dies, you gain 3 life.")
+(def type (starting creature))
+(def cost (list (mana 1) (gem onyx)))
 (def stats (pair 1 1))

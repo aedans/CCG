@@ -1,0 +1,5 @@
+(def name "Harbinger of Adventure")
+(def text "When Harbinger of Adventure is targeted by a card for the first time each turn, it gets [+1/+0] until end of turn.")
+(def type (starting creature))
+(def cost (list (mana 1) (gem opal)))
+(def stats (pair 1 2))

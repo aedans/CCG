@@ -2,9 +2,9 @@ package io.github.aedans.ccg.client.simple
 
 import io.github.aedans.ccg.backend.Card
 import java.awt.BorderLayout
+import java.awt.Dimension
 import java.awt.GridLayout
 import java.io.File
-import javax.swing.ImageIcon
 import javax.swing.JScrollPane
 import javax.swing.ScrollPaneConstants
 
@@ -50,9 +50,11 @@ class DeckUI(mainMenu: MainMenu, deck: Deck) : KFrame("Deck Builder") {
 
     private val allCards = JScrollPane(KPanel().apply {
         layout = GridLayout(3, 0)
-        addAll(Card.cards().map { card -> KButton("", ImageIcon(CardComponent.cardImage(card))) { add(card.name) } })
+        addAll(Card.cards().map { card -> KButton("", CardComponent.cardIcon(card)) { add(card.name) } })
     }).apply {
         horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS
+        verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
+        preferredSize = Dimension(1080, CardComponent.height * 3 + 50)
     }
 
     private fun refresh() {

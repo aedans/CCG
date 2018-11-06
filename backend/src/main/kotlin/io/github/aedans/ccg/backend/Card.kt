@@ -1,32 +1,38 @@
 package io.github.aedans.ccg.backend
 
+import io.github.aedans.ccg.backend.MRep.Companion.string
 import java.io.File
 
 data class Card(val name: String,
-                val type: String,
                 val text: String,
-                val cost: String,
-                val stats: Pair<Int, Int>?) {
+                val type: Type,
+                val cost: List<Cost>,
+                val stats: Pair<Int, Int>?) : MRep {
+    override fun mRep(): String {
+        return "(card " +
+                "${string(name)} " +
+                "${string(text)} " +
+                "${string(type)} " +
+                "${string(cost.map { string(it) })} " +
+                "${stats?.let { string(string(it.first) to string(it.second)) }})"
+    }
+
     companion object {
         val cardFile = File("./cards")
 
         fun card(name: String) = run {
             val script = File(cardFile, "$name.m").readLines().joinToString("", "", "")
-            val result = Parser.parser(script.asSequence())
-            val exprs = when (result) {
-                is Parser.Result.Failure -> throw Exception("Could not parse $name.m")
-                is Parser.Result.Success -> if (result.rest.any())
-                    throw Exception("Could not parse $name.m at char '${result.rest.first()}'")
-                else
-                    result.value
+            val localEnv = try {
+                Interpreter.run(script)
+            } catch (e: Exception) {
+                throw Exception("Error loading card $name", e)
             }
-            val localEnv = Interpreter.run(exprs.toList(), env)
             @Suppress("UNCHECKED_CAST")
             Card(
                 localEnv["name"] as String,
-                localEnv["type"] as String,
                 localEnv["text"] as String,
-                localEnv["cost"] as String,
+                localEnv["type"] as Type,
+                localEnv["cost"] as List<Cost>,
                 localEnv["stats"] as Pair<Int, Int>?
             )
         }
@@ -34,8 +40,5 @@ data class Card(val name: String,
         fun cards() = cardFile
             .listFiles()
             .map { card(it.nameWithoutExtension) }
-
-        val env = Interpreter.Env(emptyMap())
-            .put("pair", Interpreter.Function { args -> args[0] to args[1] })
     }
 }

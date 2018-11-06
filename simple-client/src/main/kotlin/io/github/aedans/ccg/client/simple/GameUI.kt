@@ -1,31 +1,78 @@
 package io.github.aedans.ccg.client.simple
 
-import io.github.aedans.ccg.backend.Game
-import io.github.aedans.ccg.backend.Player
-import io.github.aedans.server.simple.Connection
-import io.github.aedans.server.simple.JsonConnection
-import io.github.aedans.server.simple.read
-import io.github.aedans.server.simple.write
+import io.github.aedans.ccg.backend.*
 import java.awt.BorderLayout
 
-data class GameUI(val name1: String, val name2: String) : KFrame("Game between $name1 and $name2") {
+data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
     val hand = KHorizontalList()
     val mana = KVerticalList()
     val life = KLabel("0")
+    val endTurn = KButton("End Turn") { nextAction.set("null") }
+
+    var nextAction = Notify<String>()
 
     init {
         add(hand, BorderLayout.SOUTH)
         add(mana, BorderLayout.EAST)
         add(life, BorderLayout.WEST)
+        mana.add(endTurn)
     }
 
-    companion object {
-        fun start(player1: Player, connection: Connection) {
-            val connection2 = JsonConnection.create(connection)
-            connection2.output.write(player1)
-            val player2 = connection2.input.read<Player>()
-            val connection1 = UIConnection(player1.name, GameUI(player1.name, player2.name))
-            Game(connection1.combine(connection2)).run(listOf(player1, player2))
-        }
+    override fun write(string: String) {
+        Interpreter.eval(string, env)
     }
+
+    override fun read(): String = run {
+        val await = nextAction.await()
+        nextAction = Notify()
+        await
+    }
+
+    fun connection() = Connection(
+        ReaderT { this@GameUI.read() },
+        WriterT { this@GameUI.write(it) }
+    )
+
+    @Suppress("UNCHECKED_CAST")
+    val env = Interpreter.env
+        .put("add-to-hand", Interpreter.Function { args ->
+            val name = args[0] as String
+            val cards = args[1] as List<Card>
+            if (name == self) {
+                cards.forEach { card ->
+                    val component = KButton("", CardComponent.cardIcon(card)) { nextAction.set(Action.play(self, card)) }
+                    hand.add(component)
+                }
+                pack()
+            }
+        })
+        .put("draw", Interpreter.Function { args ->
+            val name = args[0] as String
+            val cards = args[1] as List<Card>
+            if (name == self) {
+                cards.forEach { card ->
+                    val component = KButton("", CardComponent.cardIcon(card)) { nextAction.set(Action.play(self, card)) }
+                    hand.add(component)
+                }
+                pack()
+            }
+        })
+        .put("add-mana", Interpreter.Function { args ->
+            val name = args[0] as String
+            val i = args[1] as Int
+            if (name == self) {
+                for (it in 0 until i) {
+                    mana.add(Mana())
+                    pack()
+                }
+            }
+        })
+        .put("gain-life", Interpreter.Function { args ->
+            val name = args[0] as String
+            val i = args[1] as Int
+            if (name == self) {
+                life.text = (life.text.toInt() + i).toString()
+                pack()
+            }
+        })
 }

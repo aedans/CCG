@@ -1,0 +1,5 @@
+(def name "Combat Bot")
+(def text "")
+(def type (starting creature))
+(def cost (list (mana 1)))
+(def stats (pair 1 1))

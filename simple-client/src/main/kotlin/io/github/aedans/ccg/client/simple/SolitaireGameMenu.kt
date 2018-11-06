@@ -1,10 +1,9 @@
 package io.github.aedans.ccg.client.simple
 
 import io.github.aedans.ccg.backend.Card
+import io.github.aedans.ccg.backend.Game
 import io.github.aedans.ccg.backend.Player
-import io.github.aedans.server.simple.Server
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.async
 
 @UseExperimental(InternalCoroutinesApi::class)
 class SolitaireGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Solitaire Game") {
@@ -12,18 +11,6 @@ class SolitaireGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Solitaire 
     private val deckBox1 = KTextField("Default1")
     private val deckBox2 = KTextField("Default2")
     private val submit = KButton("Submit") {
-        val connection1 = Server.host(portBox.text.toInt())
-        val connection2 = Server.join("localhost", portBox.text.toInt())
-        connection1.invokeOnCompletion(onCancelling = true) {
-            @Suppress("NestedLambdaShadowedImplicitParameter")
-            if (it != null) isVisible = true
-        }
-        connection2.invokeOnCompletion(onCancelling = true) @Suppress("NestedLambdaShadowedImplicitParameter") {
-            if (it != null) {
-                isVisible = true
-                KExceptionPopup(it)
-            }
-        }
         val deck2 = Deck.deck(deckBox1.text)
         val deck1 = Deck.deck(deckBox1.text)
         val player1 = Player(
@@ -37,10 +24,9 @@ class SolitaireGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Solitaire 
             deck2.cards.map(Card.Companion::card)
         )
         isVisible = false
-        @Suppress("DeferredResultUnused")
-        async { GameUI.start(player1, connection2.await()) }
-        @Suppress("DeferredResultUnused")
-        async { GameUI.start(player2, connection1.await()) }
+        val ui1 = GameUI(player1.name)
+        val ui2 = GameUI(player2.name)
+        Game(mapOf(player1.name to ui1.connection(), player2.name to ui2.connection())).run(listOf(player1, player2))
     }
 
     private val cancel = KButton("Cancel") {
