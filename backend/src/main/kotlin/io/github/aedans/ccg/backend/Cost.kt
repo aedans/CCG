@@ -8,7 +8,7 @@ interface Cost : MRep {
 
     data class Gem(val gem: io.github.aedans.ccg.backend.Gem) : Cost {
         override fun toString() = "($gem)"
-        override fun mRep() = "(gem ${MRep.string(gem)}"
+        override fun mRep() = "(gem ${MRep.string(gem)})"
     }
 
     data class Life(val i: Int) : Cost {
