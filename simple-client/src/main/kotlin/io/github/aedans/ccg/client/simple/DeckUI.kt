@@ -49,7 +49,7 @@ class DeckUI(mainMenu: MainMenu, deck: Deck) : KFrame("Deck Builder") {
     }
 
     private val allCards = JScrollPane(KPanel().apply {
-        layout = GridLayout(4, 0)
+        layout = GridLayout(3, 0)
         addAll(Card.cards().map { card -> KButton("", ImageIcon(CardComponent.cardImage(card))) { add(card.name) } })
     }).apply {
         horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS

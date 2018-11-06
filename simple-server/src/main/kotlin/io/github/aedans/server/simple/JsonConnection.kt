@@ -16,6 +16,14 @@ data class JsonConnection(val input: JsonReader, val output: JsonWriter) : Conne
 
     }
 
+    override fun addMana(name: String, i: Int) {
+
+    }
+
+    override fun gainLife(name: String, i: Int) {
+
+    }
+
     companion object {
         fun create(connection: Connection) = JsonConnection(
             Gson.newJsonReader(InputStreamReader(connection.input)),

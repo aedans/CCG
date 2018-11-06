@@ -12,10 +12,22 @@ class Game(private val connection: ConnectionGroup) {
         copy(hand = hand + library.take(number), library = library.drop(number))
     }
 
+    fun Player.addMana(i: Int = 1) = run {
+        connection.addMana(name, i)
+        copy(mana = mana + i)
+    }
+
+    fun Player.gainLife(i: Int = 1) = run {
+        connection.gainLife(name, i)
+        copy(life = life + 1)
+    }
+
     fun run(players: List<Player>) {
         var players = players
         players = players.map { it.addToHand(it.starting) }
         players = players.map { it.draw(3) }
+        players = players.map { it.addMana() }
+        players = players.map { it.gainLife(15) }
         while (players.any { it.life >= 0 }) {
             
         }

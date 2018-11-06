@@ -9,8 +9,8 @@ import kotlinx.coroutines.async
 @UseExperimental(InternalCoroutinesApi::class)
 class SolitaireGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Solitaire Game") {
     private val portBox = KTextField("8080")
-    private val deckBox1 = KTextField("Default")
-    private val deckBox2 = KTextField("Default")
+    private val deckBox1 = KTextField("Default1")
+    private val deckBox2 = KTextField("Default2")
     private val submit = KButton("Submit") {
         val connection1 = Server.host(portBox.text.toInt())
         val connection2 = Server.join("localhost", portBox.text.toInt())
@@ -29,17 +29,14 @@ class SolitaireGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Solitaire 
         val player1 = Player(
             "player1",
             listOf(Card.card(deck1.starter1), Card.card(deck1.starter2), Card.card(deck1.starter3)),
-            deck1.cards.map(Card.Companion::card),
-            emptyList(),
-            15
+            deck1.cards.map(Card.Companion::card)
         )
         val player2 = Player(
             "player2",
             listOf(Card.card(deck2.starter1), Card.card(deck2.starter2), Card.card(deck2.starter3)),
-            deck2.cards.map(Card.Companion::card),
-            emptyList(),
-            15
+            deck2.cards.map(Card.Companion::card)
         )
+        isVisible = false
         @Suppress("DeferredResultUnused")
         async { GameUI.start(player1, connection2.await()) }
         @Suppress("DeferredResultUnused")

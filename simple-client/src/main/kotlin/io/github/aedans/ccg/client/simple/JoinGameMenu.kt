@@ -26,9 +26,7 @@ class JoinGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Join Game") {
         val player = Player(
             nameBox.text,
             listOf(Card.card(deck.starter1), Card.card(deck.starter2), Card.card(deck.starter3)),
-            deck.cards.map(Card.Companion::card),
-            emptyList(),
-            15
+            deck.cards.map(Card.Companion::card)
         )
         GameUI.start(player, connection.await())
     }

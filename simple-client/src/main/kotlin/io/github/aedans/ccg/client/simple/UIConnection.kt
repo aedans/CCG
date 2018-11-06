@@ -17,4 +17,20 @@ class UIConnection(val name: String, val gameUI: GameUI) : ConnectionGroup {
             gameUI.pack()
         }
     }
+
+    override fun addMana(name: String, i: Int) {
+        if (name == this.name) {
+            (0 until i).forEach {
+                gameUI.mana.add(Mana())
+                gameUI.pack()
+            }
+        }
+    }
+
+    override fun gainLife(name: String, i: Int) {
+        if (name == this.name) {
+            gameUI.life.text = (gameUI.life.text.toInt() + i).toString()
+            gameUI.pack()
+        }
+    }
 }

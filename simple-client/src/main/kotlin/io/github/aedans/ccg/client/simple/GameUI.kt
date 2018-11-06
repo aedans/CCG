@@ -11,10 +11,12 @@ import java.awt.BorderLayout
 data class GameUI(val name1: String, val name2: String) : KFrame("Game between $name1 and $name2") {
     val hand = KHorizontalList()
     val mana = KVerticalList()
+    val life = KLabel("0")
 
     init {
         add(hand, BorderLayout.SOUTH)
         add(mana, BorderLayout.EAST)
+        add(life, BorderLayout.WEST)
     }
 
     companion object {
