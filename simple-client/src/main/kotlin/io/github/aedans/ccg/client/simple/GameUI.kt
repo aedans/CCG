@@ -2,20 +2,58 @@ package io.github.aedans.ccg.client.simple
 
 import io.github.aedans.ccg.backend.*
 import java.awt.BorderLayout
+import java.awt.Dimension
+import javax.swing.JScrollPane
+import javax.swing.ScrollPaneConstants
 
 data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
     val hand = KHorizontalList()
+    val field = KHorizontalList()
     val mana = KVerticalList()
     val life = KLabel("0")
-    val endTurn = KButton("End Turn") { nextAction.set("null") }
+    val endTurn = KButton("End Turn") { nextAction.set(Action.EndTurn) }
 
-    var nextAction = Notify<String>()
+    val handCards = mutableListOf<Card>()
+    val fieldCards = mutableListOf<Card>()
+
+    var nextAction = Notify<Action>()
 
     init {
-        add(hand, BorderLayout.SOUTH)
+        add(JScrollPane(hand).apply {
+            preferredSize = Dimension(CardComponent.width * 10, CardComponent.height + 20)
+            horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
+            verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
+        }, BorderLayout.SOUTH)
+
+        add(JScrollPane(field).apply {
+            preferredSize = Dimension(CardComponent.width * 10, CardComponent.height + 20)
+            horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
+            verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER
+        }, BorderLayout.CENTER)
+
         add(mana, BorderLayout.EAST)
         add(life, BorderLayout.WEST)
         mana.add(endTurn)
+    }
+
+    private fun updateHand() {
+        hand.removeAll()
+        handCards.forEach { card ->
+            val component = KButton("", CardComponent.cardIcon(card)) { nextAction.set(Action.Cast(self, card)) }
+            hand.add(component)
+        }
+        pack()
+        repaint()
+    }
+
+    private fun updateField() {
+        field.removeAll()
+        fieldCards.forEach { card ->
+            val component = KButton("", CardComponent.cardIcon(card)) { }
+            field.add(component)
+        }
+        pack()
+        repaint()
     }
 
     override fun write(string: String) {
@@ -25,7 +63,7 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
     override fun read(): String = run {
         val await = nextAction.await()
         nextAction = Notify()
-        await
+        await.asM()
     }
 
     fun connection() = Connection(
@@ -35,29 +73,45 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
 
     @Suppress("UNCHECKED_CAST")
     val env = Interpreter.env
-        .put("add-to-hand", Interpreter.Function { args ->
+        .put("add-cards-to-hand", IFunction { args ->
             val name = args[0] as String
             val cards = args[1] as List<Card>
             if (name == self) {
-                cards.forEach { card ->
-                    val component = KButton("", CardComponent.cardIcon(card)) { nextAction.set(Action.play(self, card)) }
-                    hand.add(component)
-                }
-                pack()
+                handCards.addAll(cards)
+                updateHand()
             }
         })
-        .put("draw", Interpreter.Function { args ->
+        .put("remove-cards-from-hand", IFunction { args ->
             val name = args[0] as String
             val cards = args[1] as List<Card>
             if (name == self) {
-                cards.forEach { card ->
-                    val component = KButton("", CardComponent.cardIcon(card)) { nextAction.set(Action.play(self, card)) }
-                    hand.add(component)
-                }
-                pack()
+                cards.forEach { handCards.remove(it) }
+                updateHand()
             }
         })
-        .put("add-mana", Interpreter.Function { args ->
+        .put("add-cards-to-field", IFunction { args ->
+            val name = args[0] as String
+            val cards = args[1] as List<Card>
+            if (name == self) {
+                fieldCards.addAll(cards)
+                updateField()
+            }
+        })
+        .put("remove-cards-from-field", IFunction { args ->
+            val name = args[0] as String
+            val cards = args[1] as List<Card>
+            if (name == self) {
+                fieldCards.removeAll(cards)
+                updateField()
+            }
+        })
+        .put("add-cards-to-library", IFunction { args ->
+
+        })
+        .put("remove-cards-from-library", IFunction { args ->
+
+        })
+        .put("add-mana", IFunction { args ->
             val name = args[0] as String
             val i = args[1] as Int
             if (name == self) {
@@ -67,12 +121,18 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
                 }
             }
         })
-        .put("gain-life", Interpreter.Function { args ->
+        .put("add-life", IFunction { args ->
             val name = args[0] as String
             val i = args[1] as Int
             if (name == self) {
                 life.text = (life.text.toInt() + i).toString()
                 pack()
             }
+        })
+        .put("end-turn", IFunction { args ->
+
+        })
+        .put("do-nothing", IFunction { args ->
+
         })
 }

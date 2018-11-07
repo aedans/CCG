@@ -42,6 +42,11 @@ class CardComponent(card: Card) : KImage(cardImage(card)) {
             var x = 5
             var y = half + fontHeight + 10
             for (word in words) {
+                if (word == "|") {
+                    x = 5
+                    y += fontHeight + 5
+                    continue
+                }
                 val stringWidth = graphics.fontMetrics.stringWidth("$word ")
                 if (x + stringWidth >= width) {
                     x = 5

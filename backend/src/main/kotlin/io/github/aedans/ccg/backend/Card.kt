@@ -1,23 +1,45 @@
 package io.github.aedans.ccg.backend
 
 import io.github.aedans.ccg.backend.MRep.Companion.string
+import org.intellij.lang.annotations.Language
 import java.io.File
 
-data class Card(val name: String,
-                val text: String,
-                val type: Type,
-                val cost: List<Cost>,
-                val stats: Pair<Int, Int>?) : MRep {
-    override fun mRep(): String {
+data class Card(
+    val name: String,
+    val text: String,
+    val type: Type,
+    val cost: List<Cost>,
+    val stats: Pair<Int, Int>?,
+    val cast: Expr
+) : MRep {
+    override fun asM(): String {
         return "(card " +
                 "${string(name)} " +
                 "${string(text)} " +
                 "${string(type)} " +
                 "${string(cost.map { string(it) })} " +
-                "${stats?.let { string(string(it.first) to string(it.second)) }})"
+                "${stats?.let { string(string(it.first) to string(it.second)) }} " +
+                "${string(cast)})"
     }
 
     companion object {
+        @Language("m")
+        val castPermanent = "(add-cards-to-field caster (list this))"
+
+        val env = Env()
+            .put("card", IFunction { args ->
+                @Suppress("UNCHECKED_CAST")
+                Card(
+                    args[0] as String,
+                    args[1] as String,
+                    args[2] as Type,
+                    args[3] as List<Cost>,
+                    args[4] as Pair<Int, Int>?,
+                    args[5] as Expr
+                )
+            })
+            .put("cast-permanent", Parser.parse(castPermanent, Parser.exprParser))
+
         val cardFile = File("./cards")
 
         fun card(name: String) = run {
@@ -33,7 +55,8 @@ data class Card(val name: String,
                 localEnv["text"] as String,
                 localEnv["type"] as Type,
                 localEnv["cost"] as List<Cost>,
-                localEnv["stats"] as Pair<Int, Int>?
+                localEnv["stats"] as Pair<Int, Int>?,
+                (localEnv["cast"] as Expr?) ?: Expr.Identifier("do-nothing")
             )
         }
 

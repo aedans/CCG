@@ -3,3 +3,4 @@
 (def type (starting creature))
 (def cost (list (mana 2) (gem topaz)))
 (def stats (pair 3 1))
+(def cast cast-permanent)

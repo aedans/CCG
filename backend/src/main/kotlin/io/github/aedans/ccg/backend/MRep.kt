@@ -1,10 +1,10 @@
 package io.github.aedans.ccg.backend
 
 interface MRep {
-    fun mRep(): String
+    fun asM(): String
 
     companion object {
-        fun string(mRep: MRep) = mRep.mRep()
+        fun string(mRep: MRep) = mRep.asM()
         fun string(int: Int) = int.toString()
         fun string(string: String) = "\"${string.replace("\"", "\\\"")}\""
         fun string(list: List<String>) = "(list ${list.joinToString(" ", "", "")})"

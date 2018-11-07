@@ -29,7 +29,8 @@ class HostGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Host Game") {
         )
         val player2 = Interpreter.value<Player>(connection.await().input.read()!!)
         val ui = GameUI(player1.name)
-        Game(mapOf(player1.name to ui.connection(), player2.name to connection.await())).run(listOf(player1, player2))
+        Game(mapOf(player1.name to ui.connection(), player2.name to connection.await()))
+            .run(mapOf(player1.name to player1, player2.name to player2))
     }
 
     private val cancel = KButton("Cancel") {

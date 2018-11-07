@@ -3,3 +3,4 @@
 (def type (starting creature))
 (def cost (list (mana 2)))
 (def stats (pair 2 2))
+(def cast cast-permanent)

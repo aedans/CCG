@@ -1,4 +1,5 @@
 (def name "Emerald")
-(def text "Grants 1 [Emerald].")
+(def text "Grants [Emerald].")
 (def type (starting artifact))
 (def cost (list (mana 1)))
+(def cast cast-permanent)

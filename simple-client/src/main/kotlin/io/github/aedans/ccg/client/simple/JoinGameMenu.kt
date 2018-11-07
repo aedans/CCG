@@ -30,7 +30,7 @@ class JoinGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Join Game") {
             deck.cards.map(Card.Companion::card)
         )
         val (readerT, writerT) = connection.await()
-        writerT.write(player.mRep())
+        writerT.write(player.asM())
         val ui = GameUI(player.name)
         launch { readerT.pipe(ui) }
         launch { ui.pipe(writerT) }

@@ -7,7 +7,6 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 @UseExperimental(InternalCoroutinesApi::class)
 class SolitaireGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Solitaire Game") {
-    private val portBox = KTextField("8080")
     private val deckBox1 = KTextField("Default1")
     private val deckBox2 = KTextField("Default2")
     private val submit = KButton("Submit") {
@@ -26,7 +25,8 @@ class SolitaireGameMenu(private val mainMenu: MainMenu) : KMenuFrame("Solitaire 
         isVisible = false
         val ui1 = GameUI(player1.name)
         val ui2 = GameUI(player2.name)
-        Game(mapOf(player1.name to ui1.connection(), player2.name to ui2.connection())).run(listOf(player1, player2))
+        Game(mapOf(player1.name to ui1.connection(), player2.name to ui2.connection()))
+            .run(mapOf(player1.name to player1, player2.name to player2))
     }
 
     private val cancel = KButton("Cancel") {

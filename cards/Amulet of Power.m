@@ -1,4 +1,5 @@
 (def name "Amulet of Power")
-(def text "Enters tapped. Tap: add (1).")
+(def text "Enters tapped. | [Tap]: Gain (1) until end of turn.")
 (def type (starting artifact))
 (def cost (list (mana 2) (gem jade)))
+(def cast cast-permanent)

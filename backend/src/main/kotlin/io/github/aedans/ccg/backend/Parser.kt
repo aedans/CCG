@@ -89,7 +89,7 @@ object Parser {
 
     fun <R> ignoreUnused(parser: Parser<R, Char>) = combineParserRight(repeatParser(whitespaceParser), parser)
 
-    fun isIdentifierCharacter(c: Char) = !(isWhitespace(c) || c == '(' || c == ')' || c == '"')
+    fun isIdentifierCharacter(c: Char) = !(isWhitespace(c) || c == '(' || c == ')' || c == '"' || c == '\'')
 
     val identifierCharParser: Parser<Char, Char> = predicateParser(this::isIdentifierCharacter)
     val identifierParser: Parser<Expr.Identifier, Char> = ignoreUnused(mapParserResult(repeatParser1(identifierCharParser)) { e -> Expr.Identifier(e) })
@@ -99,21 +99,24 @@ object Parser {
     val stringValueParser: Parser<Expr.String, Char> = mapParserResult(repeatParser(stringCharParser)) { e -> Expr.String(e) }
     val stringParser: Parser<Expr.String, Char> = ignoreUnused(combineParserRight(quoteParser, combineParserLeft(stringValueParser, quoteParser)))
 
+    val apostropheParser: Parser<Char, Char> = predicateParser { it == '\'' }
+    val quoteExprParser: Parser<Expr.Quote, Char> = ignoreUnused(mapParserResult(combineParserRight(apostropheParser, lazyParser { exprParser })) { e -> Expr.Quote(e) })
+
     val openParenParser: Parser<Char, Char> = ignoreUnused(predicateParser { it == '(' })
     val closeParenParser: Parser<Char, Char> = ignoreUnused(predicateParser { it == ')' })
 
     val listExprParser1: Parser<Sequence<Expr>, Char> = combineParserRight(openParenParser, combineParserLeft(lazyParser { parser }, closeParenParser))
     val listExprParser: Parser<Expr.List, Char> = ignoreUnused(mapParserResult(listExprParser1) { e -> Expr.List(e) })
-    val exprParser: Parser<Expr, Char> = alternativeParser(stringParser, alternativeParser(identifierParser, listExprParser))
+    val exprParser: Parser<Expr, Char> = alternativeParser(stringParser, alternativeParser(identifierParser, alternativeParser(quoteExprParser, listExprParser)))
 
     val parser: Parser<Sequence<Expr>, Char> = repeatParser(exprParser)
 
     fun <R> parse(string: String, p: Parser<R, Char>) = run {
         val result = p(string.asSequence())
         when (result) {
-            is Result.Failure -> throw Exception("Could not parse $string")
+            is Result.Failure -> throw Exception("Could not parse")
             is Result.Success -> if (result.rest.any())
-                throw Exception("Could not parse at char '${result.rest.first()}'")
+                throw Exception("Could not parse \"${result.rest.takeWhile { !isNewline(it) }.joinToString("", "", "")}\"")
             else
                 result.value
         }

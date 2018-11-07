@@ -3,3 +3,4 @@
 (def type (starting creature))
 (def cost (list (mana 1) (gem opal)))
 (def stats (pair 1 2))
+(def cast cast-permanent)
