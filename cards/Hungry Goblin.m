@@ -1,6 +1,6 @@
 (def name "Hungry Goblin")
 (def text "Menace.")
 (def type (starting creature))
-(def cost (list (mana 2) (gem ruby)))
+(def cost (list (mana 2) (gem ruby 1)))
 (def stats (pair 2 2))
 (def cast cast-permanent)

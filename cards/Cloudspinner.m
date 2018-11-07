@@ -1,6 +1,6 @@
 (def name "Cloudspinner")
 (def text "When Cloudspinner enters the battlefield, target creature an opponent controls doesn't untap during its controller's next untap step.")
 (def type (starting creature))
-(def cost (list (mana 2) (gem topaz)))
+(def cost (list (mana 2) (gem topaz 1)))
 (def stats (pair 3 1))
 (def cast cast-permanent)

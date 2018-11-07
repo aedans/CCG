@@ -42,6 +42,11 @@ sealed class Gem : MRep {
     }
 
     companion object {
+        val emptyMap = mapOf(
+            Pearl to 0, Opal to 0, Topaz to 0, Ruby to 0,
+            Emerald to 0, Jade to 0, Sapphire to 0, Onyx to 0
+        )
+
         val env = Env()
             .put("pearl", Gem.Pearl)
             .put("opal", Gem.Opal)

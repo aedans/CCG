@@ -19,13 +19,18 @@ interface Action : MRep {
 
     data class Cast(val name: String, val card: Card) : Composite {
         override fun base(players: Map<String, Player>) = run {
-            val env = Action.env
-                .put("caster", name)
-                .put("this", card)
-            listOf(
-                RemoveCardsFromHand(name, listOf(card)),
-                Interpreter.value<Action>(card.cast, env)
-            )
+            val player = players[name]!!
+            if (card.cost.all { it.canBePaid(player) }) {
+                val env = Action.env
+                    .put("caster", name)
+                    .put("this", card)
+                card.cost.map { it.pay(player) } + listOf(
+                    RemoveCardsFromHand(name, listOf(card)),
+                    Interpreter.value<Action>(card.cast, env)
+                )
+            } else {
+                listOf()
+            }
         }
 
         override fun asM() = "(cast ${string(name)} ${card.asM()})"
@@ -74,9 +79,19 @@ interface Action : MRep {
         override fun asM() = "(remove-cards-from-field ${string(name)} ${string(cards.map { string(it) })})"
     }
 
-    data class AddMana(val name: String, val i: Int) : Action {
-        override fun run(players: Map<String, Player>) = players.update(name) { it.copy(mana = it.mana + i) }
-        override fun asM() = "(add-mana ${string(name)} ${string(i)})"
+    data class AddMaxMana(val name: String, val i: Int) : Action {
+        override fun run(players: Map<String, Player>) = players.update(name) { it.copy(maxMana = it.maxMana + i) }
+        override fun asM() = "(add-max-mana ${string(name)} ${string(i)})"
+    }
+
+    data class AddCurrentMana(val name: String, val i: Int) : Action {
+        override fun run(players: Map<String, Player>) = players.update(name) { it.copy(currentMana = it.currentMana + i) }
+        override fun asM() = "(add-current-mana ${string(name)} ${string(i)})"
+    }
+
+    data class AddGem(val name: String, val gem: Gem, val i: Int) : Action {
+        override fun run(players: Map<String, Player>) = players.update(name) { it.copy(gems = it.gems.update(gem) { a -> a + i }) }
+        override fun asM() = "(add-gem ${string(name)} ${string(gem)} ${string(i)}"
     }
 
     data class AddLife(val name: String, val i: Int) : Action {
@@ -105,8 +120,10 @@ interface Action : MRep {
             .put("remove-cards-from-library", IFunction { args -> RemoveCardsFromLibrary(args[0] as String, args[1] as List<Card>) })
             .put("add-cards-to-field", IFunction { args -> AddCardsToField(args[0] as String, args[1] as List<Card>) })
             .put("remove-cards-from-field", IFunction { args -> RemoveCardsFromField(args[0] as String, args[1] as List<Card>) })
+            .put("add-max-mana", IFunction { args -> AddMaxMana(args[0] as String, args[1] as Int) })
+            .put("add-current-mana", IFunction { args -> AddCurrentMana(args[0] as String, args[1] as Int) })
+            .put("add-gem", IFunction { args -> AddGem(args[0] as String, args[1] as Gem, args[2] as Int) })
             .put("add-life", IFunction { args -> AddLife(args[0] as String, args[1] as Int) })
-            .put("add-mana", IFunction { args -> AddMana(args[0] as String, args[1] as Int) })
             .put("do-nothing", DoNothing)
             .put("end-turn", EndTurn)
     }

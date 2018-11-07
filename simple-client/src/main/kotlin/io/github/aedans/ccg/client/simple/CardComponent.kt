@@ -12,8 +12,8 @@ class CardComponent(card: Card) : KImage(cardImage(card)) {
     }
 
     companion object {
-        val width = 480 / 3
-        val height = 720 / 3
+        const val width = 480 / 3
+        const val height = 720 / 3
 
         fun cardIcon(card: Card) = ImageIcon(cardImage(card))
 

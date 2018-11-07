@@ -15,6 +15,8 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
 
     val handCards = mutableListOf<Card>()
     val fieldCards = mutableListOf<Card>()
+    var maxMana = 0
+    var currentMana = 0
 
     var nextAction = Notify<Action>()
 
@@ -33,7 +35,6 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
 
         add(mana, BorderLayout.EAST)
         add(life, BorderLayout.WEST)
-        mana.add(endTurn)
     }
 
     private fun updateHand() {
@@ -51,6 +52,16 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
         fieldCards.forEach { card ->
             val component = KButton("", CardComponent.cardIcon(card)) { }
             field.add(component)
+        }
+        pack()
+        repaint()
+    }
+
+    private fun updateMana() {
+        mana.removeAll()
+        mana.add(endTurn)
+        for (i in 0 until maxMana) {
+            mana.add(Mana(i < currentMana))
         }
         pack()
         repaint()
@@ -111,14 +122,20 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
         .put("remove-cards-from-library", IFunction { args ->
 
         })
-        .put("add-mana", IFunction { args ->
+        .put("add-max-mana", IFunction { args ->
             val name = args[0] as String
             val i = args[1] as Int
             if (name == self) {
-                for (it in 0 until i) {
-                    mana.add(Mana())
-                    pack()
-                }
+                maxMana += i
+                updateMana()
+            }
+        })
+        .put("add-current-mana", IFunction { args ->
+            val name = args[0] as String
+            val i = args[1] as Int
+            if (name == self) {
+                currentMana += i
+                updateMana()
             }
         })
         .put("add-life", IFunction { args ->

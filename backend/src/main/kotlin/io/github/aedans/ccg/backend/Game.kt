@@ -19,21 +19,25 @@ class Game(private val connections: Map<String, Connection>) {
             listOf(
                 Action.AddCardsToHand(it.name, it.starting),
                 Action.Draw(it.name, 3),
-                Action.AddMana(it.name, 1),
+                Action.AddMaxMana(it.name, 1),
                 Action.AddLife(it.name, 15)
             )
         }.forEach { players = it.runAndWrite(players) }
         while (true) {
-            players.values.forEach { player ->
+            for (key in players.keys) {
+                fun player() = players[key]!!
+
+                players = Action.AddCurrentMana(player().name, player().maxMana - player().currentMana).runAndWrite(players)
+
                 var nextAction: Action
                 do {
-                    nextAction = Interpreter.value(player.nextAction()!!, Action.env)
+                    nextAction = Interpreter.value(player().nextAction()!!, Action.env)
                     players = nextAction.runAndWrite(players)
                 } while (nextAction != Action.EndTurn)
 
                 turn++
                 if (turn % (players.size + 1) == 0)
-                    players.values.map { Action.AddMana(it.name, 1) }.forEach { players = it.runAndWrite(players) }
+                    players.values.map { Action.AddMaxMana(it.name, 1) }.forEach { players = it.runAndWrite(players) }
             }
 
             players.values.map { Action.Draw(it.name, 1) }.forEach { players = it.runAndWrite(players) }

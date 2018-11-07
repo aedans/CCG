@@ -40,4 +40,5 @@ object Interpreter {
         .put(Card.env)
         .put(Player.env)
         .put("pair", IFunction { args -> args[0] to args[1] })
+        .put("map", IFunction { args -> (args[0] as List<Pair<Any, Any>>).toMap() })
 }
