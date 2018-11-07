@@ -146,6 +146,9 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
                 pack()
             }
         })
+        .put("add-gem", IFunction { args ->
+
+        })
         .put("end-turn", IFunction { args ->
 
         })

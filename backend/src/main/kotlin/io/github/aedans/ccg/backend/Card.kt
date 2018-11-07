@@ -10,7 +10,9 @@ data class Card(
     val type: Type,
     val cost: List<Cost>,
     val stats: Pair<Int, Int>?,
-    val cast: Expr
+    val cast: Expr,
+    val enterField: Expr,
+    val leaveField: Expr
 ) : MRep {
     override fun asM(): String {
         return "(card " +
@@ -19,7 +21,9 @@ data class Card(
                 "${string(type)} " +
                 "${string(cost.map { string(it) })} " +
                 "${stats?.let { string(string(it.first) to string(it.second)) }} " +
-                "${string(cast)})"
+                "${string(cast)} " +
+                "${string(enterField)} " +
+                "${string(leaveField)})"
     }
 
     companion object {
@@ -35,7 +39,9 @@ data class Card(
                     args[2] as Type,
                     args[3] as List<Cost>,
                     args[4] as Pair<Int, Int>?,
-                    args[5] as Expr
+                    args[5] as Expr,
+                    args[6] as Expr,
+                    args[7] as Expr
                 )
             })
             .put("cast-permanent", Parser.parse(castPermanent, Parser.exprParser))
@@ -56,7 +62,9 @@ data class Card(
                 localEnv["type"] as Type,
                 localEnv["cost"] as List<Cost>,
                 localEnv["stats"] as Pair<Int, Int>?,
-                (localEnv["cast"] as Expr?) ?: Expr.Identifier("do-nothing")
+                (localEnv["cast"] as Expr?) ?: Expr.Identifier("do-nothing"),
+                (localEnv["enters-field"] as Expr?) ?: Expr.Identifier("do-nothing"),
+                (localEnv["leaves-field"] as Expr?) ?: Expr.Identifier("do-nothing")
             )
         }
 
