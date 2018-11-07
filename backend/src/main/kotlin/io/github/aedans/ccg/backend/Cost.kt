@@ -27,10 +27,18 @@ interface Cost : MRep {
         override fun pay(player: Player) = Action.AddLife(player.name, -i)
     }
 
+    data class Tap(val card: Card) : Cost {
+        override fun toString() = "(tap ${card.name})"
+        override fun asM() = "(tap ${string(card)})"
+        override fun canBePaid(player: Player) = player.field.contains(card.copy(tapped = false))
+        override fun pay(player: Player) = Action.Tap(player.name, card)
+    }
+
     companion object {
         val env = Env()
             .put("mana", IFunction { args -> Mana(args[0] as Int) })
             .put("gem", IFunction { args -> Gem(args[0] as io.github.aedans.ccg.backend.Gem, args[1] as Int) })
             .put("life", IFunction { args -> Life(args[0] as Int) })
+            .put("tap", IFunction { args -> Tap(args[0] as Card) })
     }
 }

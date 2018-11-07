@@ -140,6 +140,24 @@ interface Action : MRep {
         override fun asM() = "(add-life ${string(name)} ${string(i)})"
     }
 
+    data class Tap(val name: String, val card: Card) : Action {
+        override fun run(players: Map<String, Player>, out: (String) -> Unit) = run {
+            out(asM())
+            players.update(name) { it.copy(field = (it.field - card) + card.copy(tapped = true)) }
+        }
+
+        override fun asM() = "(tap ${string(name)} ${string(card)})"
+    }
+
+    data class Untap(val name: String, val card: Card) : Action {
+        override fun run(players: Map<String, Player>, out: (String) -> Unit) = run {
+            out(asM())
+            players.update(name) { it.copy(field = (it.field - card) + card.copy(tapped = false)) }
+        }
+
+        override fun asM() = "(untap ${string(name)} ${string(card)})"
+    }
+
     object DoNothing : Action {
         override fun run(players: Map<String, Player>, out: (String) -> Unit) = players
         override fun asM() = "do-nothing"
@@ -169,6 +187,8 @@ interface Action : MRep {
             .put("add-current-mana", IFunction { args -> AddCurrentMana(args[0] as String, args[1] as Int) })
             .put("add-gem", IFunction { args -> AddGem(args[0] as String, args[1] as Gem, args[2] as Int) })
             .put("add-life", IFunction { args -> AddLife(args[0] as String, args[1] as Int) })
+            .put("tap", IFunction { args -> Tap(args[0] as String, args[1] as Card) })
+            .put("untap", IFunction { args -> Untap(args[0] as String, args[1] as Card) })
             .put("do-nothing", DoNothing)
             .put("end-turn", EndTurn)
     }

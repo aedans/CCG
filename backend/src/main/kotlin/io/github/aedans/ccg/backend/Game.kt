@@ -23,6 +23,7 @@ class Game(private val connections: Map<String, Connection>) {
                 fun player() = players[key]!!
 
                 players = Action.AddCurrentMana(player().name, player().maxMana - player().currentMana).run(players) { write(it) }
+                player().field.map { Action.Untap(player().name, it) }.forEach { players = it.run(players) { write(it) } }
 
                 var nextAction: Action
                 do {

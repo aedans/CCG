@@ -39,6 +39,7 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
 
     private fun updateHand() {
         hand.removeAll()
+        handCards.sortBy { it.name }
         handCards.forEach { card ->
             val component = KButton("", CardComponent.cardIcon(card)) { nextAction.set(Action.Cast(self, card)) }
             hand.add(component)
@@ -49,6 +50,7 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
 
     private fun updateField() {
         field.removeAll()
+        fieldCards.sortBy { it.name }
         fieldCards.forEach { card ->
             val component = KButton("", CardComponent.cardIcon(card)) { }
             field.add(component)
@@ -144,6 +146,24 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
             if (name == self) {
                 life.text = (life.text.toInt() + i).toString()
                 pack()
+            }
+        })
+        .put("tap", IFunction { args ->
+            val name = args[0] as String
+            val card = args[1] as Card
+            if (name == self) {
+                fieldCards.remove(card)
+                fieldCards.add(card.copy(tapped = true))
+                updateField()
+            }
+        })
+        .put("untap", IFunction { args ->
+            val name = args[0] as String
+            val card = args[1] as Card
+            if (name == self) {
+                fieldCards.remove(card)
+                fieldCards.add(card.copy(tapped = false))
+                updateField()
             }
         })
         .put("add-gem", IFunction { args ->
