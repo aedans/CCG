@@ -3,4 +3,4 @@
 (def type (starting artifact))
 (def cost (list (mana 2) (gem jade 1)))
 (def cast cast-permanent)
-(def tapped true)
+(def buffs (list tapped))

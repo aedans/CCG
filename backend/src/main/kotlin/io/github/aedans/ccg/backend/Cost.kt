@@ -14,7 +14,7 @@ interface Cost : MRep {
     }
 
     data class Gem(val gem: io.github.aedans.ccg.backend.Gem, val i: Int) : Cost {
-        override fun toString() = "($gem)"
+        override fun toString() = "($i $gem)"
         override fun asM() = "(gem ${string(gem)} ${string(i)})"
         override fun canBePaid(player: Player) = player.gems[gem]!! >= i
         override fun pay(player: Player) = Action.DoNothing
@@ -30,8 +30,8 @@ interface Cost : MRep {
     data class Tap(val card: Card) : Cost {
         override fun toString() = "(tap ${card.name})"
         override fun asM() = "(tap ${string(card)})"
-        override fun canBePaid(player: Player) = player.field.contains(card.copy(tapped = false))
-        override fun pay(player: Player) = Action.Tap(player.name, card)
+        override fun canBePaid(player: Player) = player.field.contains(card.copy(buffs = card.buffs + Buff.Tapped))
+        override fun pay(player: Player) = Action.AddBuff(player.name, card, Buff.Tapped)
     }
 
     companion object {

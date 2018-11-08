@@ -155,21 +155,23 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
                 pack()
             }
         })
-        .put("tap", IFunction { args ->
+        .put("add-buff", IFunction { args ->
             val name = args[0] as String
             val card = args[1] as Card
+            val buff = args[2] as Buff
             if (name == self) {
                 fieldCards.remove(card)
-                fieldCards.add(card.copy(tapped = true))
+                fieldCards.add(card.copy(buffs = card.buffs + buff))
                 updateField()
             }
         })
-        .put("untap", IFunction { args ->
+        .put("remove-buff", IFunction { args ->
             val name = args[0] as String
             val card = args[1] as Card
+            val buff = args[2] as Buff
             if (name == self) {
                 fieldCards.remove(card)
-                fieldCards.add(card.copy(tapped = false))
+                fieldCards.add(card.copy(buffs = card.buffs - buff))
                 updateField()
             }
         })

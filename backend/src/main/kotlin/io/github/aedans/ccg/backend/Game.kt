@@ -24,7 +24,7 @@ class Game(private val connections: Map<String, Connection>) {
 
                 players = Action.Draw(player().name, 1).run(players) { write(it) }
                 players = Action.AddCurrentMana(player().name, player().maxMana - player().currentMana).run(players) { write(it) }
-                player().field.map { Action.Untap(player().name, it) }.forEach { players = it.run(players) { write(it) } }
+                player().field.map { Action.RemoveBuff(player().name, it, Buff.Tapped) }.forEach { players = it.run(players) { write(it) } }
 
                 var nextAction: Action
                 do {

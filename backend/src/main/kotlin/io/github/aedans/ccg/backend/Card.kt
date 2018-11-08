@@ -10,7 +10,7 @@ data class Card(
     val type: Type,
     val cost: List<Cost>,
     val stats: Pair<Int, Int>?,
-    val tapped: Boolean,
+    val buffs: List<Buff>,
     val cast: Expr,
     val enterField: Expr,
     val leaveField: Expr
@@ -22,7 +22,7 @@ data class Card(
                 "${string(type)} " +
                 "${string(cost.map { string(it) })} " +
                 "${stats?.let { string(string(it.first) to string(it.second)) }} " +
-                "${string(tapped)} " +
+                "${string(buffs.map { string(it) })} " +
                 "${string(cast)} " +
                 "${string(enterField)} " +
                 "${string(leaveField)})"
@@ -41,7 +41,7 @@ data class Card(
                     args[2] as Type,
                     args[3] as List<Cost>,
                     args[4] as Pair<Int, Int>?,
-                    args[5] as Boolean,
+                    args[5] as List<Buff>,
                     args[6] as Expr,
                     args[7] as Expr,
                     args[8] as Expr
@@ -65,7 +65,7 @@ data class Card(
                 localEnv["type"] as Type,
                 localEnv["cost"] as List<Cost>,
                 localEnv["stats"] as Pair<Int, Int>?,
-                (localEnv["tapped"] as Boolean?) ?: false,
+                (localEnv["buffs"] as List<Buff>?) ?: emptyList(),
                 (localEnv["cast"] as Expr?) ?: Expr.Identifier("do-nothing"),
                 (localEnv["enters-field"] as Expr?) ?: Expr.Identifier("do-nothing"),
                 (localEnv["leaves-field"] as Expr?) ?: Expr.Identifier("do-nothing")

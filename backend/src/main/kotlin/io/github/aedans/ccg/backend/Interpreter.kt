@@ -39,6 +39,7 @@ object Interpreter {
         .put(Gem.env)
         .put(Card.env)
         .put(Player.env)
+        .put(Buff.env)
         .put("true", true)
         .put("false", false)
         .put("pair", IFunction { args -> args[0] to args[1] })

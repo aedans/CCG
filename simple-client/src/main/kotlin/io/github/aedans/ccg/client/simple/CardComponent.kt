@@ -38,9 +38,7 @@ class CardComponent(card: Card) : KImage(cardImage(card)) {
 
             graphics.drawString(card.type.toString(), 5, half)
 
-            val prefix = if (card.tapped) "Tapped | " else ""
-
-            val words = (prefix + card.text).split(' ')
+            val words = (card.buffs.joinToString("", "", "") { "$it. | "} + card.text).split(' ')
             var x = 5
             var y = half + fontHeight + 10
             for (word in words) {

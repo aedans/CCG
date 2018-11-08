@@ -104,6 +104,24 @@ interface Action : MRep {
         override fun asM() = "(remove-cards-from-field ${string(name)} ${string(cards.map { string(it) })})"
     }
 
+    data class AddBuff(val name: String, val card: Card, val buff: Buff) : Action {
+        override fun run(players: Map<String, Player>, out: (String) -> Unit) = run {
+            out(asM())
+            players.update(name) { it.copy(field = (it.field - card) + card.copy(buffs = card.buffs + buff)) }
+        }
+
+        override fun asM() = "(add-buff ${string(name)} ${string(card)} ${string(buff)})"
+    }
+
+    data class RemoveBuff(val name: String, val card: Card, val buff: Buff) : Action {
+        override fun run(players: Map<String, Player>, out: (String) -> Unit) = run {
+            out(asM())
+            players.update(name) { it.copy(field = (it.field - card) + card.copy(buffs = card.buffs - buff)) }
+        }
+
+        override fun asM() = "(remove-buff ${string(name)} ${string(card)} ${string(buff)})"
+    }
+
     data class AddMaxMana(val name: String, val i: Int) : Action {
         override fun run(players: Map<String, Player>, out: (String) -> Unit) = run {
             out(asM())
@@ -140,24 +158,6 @@ interface Action : MRep {
         override fun asM() = "(add-life ${string(name)} ${string(i)})"
     }
 
-    data class Tap(val name: String, val card: Card) : Action {
-        override fun run(players: Map<String, Player>, out: (String) -> Unit) = run {
-            out(asM())
-            players.update(name) { it.copy(field = (it.field - card) + card.copy(tapped = true)) }
-        }
-
-        override fun asM() = "(tap ${string(name)} ${string(card)})"
-    }
-
-    data class Untap(val name: String, val card: Card) : Action {
-        override fun run(players: Map<String, Player>, out: (String) -> Unit) = run {
-            out(asM())
-            players.update(name) { it.copy(field = (it.field - card) + card.copy(tapped = false)) }
-        }
-
-        override fun asM() = "(untap ${string(name)} ${string(card)})"
-    }
-
     object DoNothing : Action {
         override fun run(players: Map<String, Player>, out: (String) -> Unit) = players
         override fun asM() = "do-nothing"
@@ -183,12 +183,12 @@ interface Action : MRep {
             .put("remove-cards-from-library", IFunction { args -> RemoveCardsFromLibrary(args[0] as String, args[1] as List<Card>) })
             .put("add-cards-to-field", IFunction { args -> AddCardsToField(args[0] as String, args[1] as List<Card>) })
             .put("remove-cards-from-field", IFunction { args -> RemoveCardsFromField(args[0] as String, args[1] as List<Card>) })
+            .put("add-buff", IFunction { args -> AddBuff(args[0] as String, args[1] as Card, args[2] as Buff) })
+            .put("remove-buff", IFunction { args -> RemoveBuff(args[0] as String, args[1] as Card, args[2] as Buff) })
             .put("add-max-mana", IFunction { args -> AddMaxMana(args[0] as String, args[1] as Int) })
             .put("add-current-mana", IFunction { args -> AddCurrentMana(args[0] as String, args[1] as Int) })
             .put("add-gem", IFunction { args -> AddGem(args[0] as String, args[1] as Gem, args[2] as Int) })
             .put("add-life", IFunction { args -> AddLife(args[0] as String, args[1] as Int) })
-            .put("tap", IFunction { args -> Tap(args[0] as String, args[1] as Card) })
-            .put("untap", IFunction { args -> Untap(args[0] as String, args[1] as Card) })
             .put("do-nothing", DoNothing)
             .put("end-turn", EndTurn)
     }
