@@ -2,3 +2,4 @@
 (def text "You gain 5 life.")
 (def type (starting spell))
 (def cost (list (mana 1)))
+(def cast '(gain-life caster 5))

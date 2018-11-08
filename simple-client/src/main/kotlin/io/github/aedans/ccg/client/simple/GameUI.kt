@@ -17,6 +17,9 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
     val fieldCards = mutableListOf<Card>()
     var maxMana = 0
     var currentMana = 0
+    val gems = mutableMapOf<Gem, Int>().apply {
+        putAll(Gem.emptyMap)
+    }
 
     var nextAction = Notify<Action>()
 
@@ -63,7 +66,11 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
         mana.removeAll()
         mana.add(endTurn)
         for (i in 0 until maxMana) {
-            mana.add(Mana(i < currentMana))
+            mana.add(ManaUI(i < currentMana))
+        }
+        for ((gem, number) in gems) {
+            if (number != 0)
+                mana.add(GemUI(gem, number))
         }
         pack()
         repaint()
@@ -167,7 +174,13 @@ data class GameUI(val self: String) : KFrame("Game"), ReaderT, WriterT {
             }
         })
         .put("add-gem", IFunction { args ->
-
+            val name = args[0] as String
+            val gem = args[1] as Gem
+            val i = args[2] as Int
+            if (name == self) {
+                gems[gem] = gems[gem]!! + i
+                updateMana()
+            }
         })
         .put("end-turn", IFunction { args ->
 

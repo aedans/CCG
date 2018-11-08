@@ -22,6 +22,7 @@ class Game(private val connections: Map<String, Connection>) {
             for (key in players.keys) {
                 fun player() = players[key]!!
 
+                players = Action.Draw(player().name, 1).run(players) { write(it) }
                 players = Action.AddCurrentMana(player().name, player().maxMana - player().currentMana).run(players) { write(it) }
                 player().field.map { Action.Untap(player().name, it) }.forEach { players = it.run(players) { write(it) } }
 
@@ -35,8 +36,6 @@ class Game(private val connections: Map<String, Connection>) {
                 if (turn % (players.size + 1) == 0)
                     players.values.map { Action.AddMaxMana(it.name, 1) }.forEach { players = it.run(players) { write(it) } }
             }
-
-            players.values.map { Action.Draw(it.name, 1) }.forEach { players = it.run(players) { write(it) } }
         }
     }
 }

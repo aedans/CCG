@@ -4,8 +4,8 @@ GEMS
 Pearl
 -----
 
-- Taxes
 - Counterspells
+- Taxes
 - Soft Discard
 
 Opal
@@ -27,7 +27,7 @@ Ruby
 
 - Fast creatures
 - Direct damage
-- Soft evasion
+- Discard
 
 Emerald
 -------
@@ -54,5 +54,5 @@ Onyx
 ----
 
 - Life drain and life pay
-- Card draw and discard
 - Sacrifice
+- Card draw and discard
